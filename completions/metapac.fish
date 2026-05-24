@@ -44,3 +44,8 @@ complete -c metapac -n '__metapac_using_subcmd preset; and __fish_seen_subcomman
 
 complete -c metapac -n '__metapac_using_subcmd drop' -l delete -d "Also delete the .meta file"
 complete -c metapac -n '__metapac_using_subcmd remove' -l no-orphans -d "Skip orphan removal prompt"
+
+# All subcommands accept -h/--help
+for subcmd in new add adopt remove build drop list status preset
+    complete -c metapac -n "__metapac_using_subcmd $subcmd" -s h -l help -d "Show help"
+end
