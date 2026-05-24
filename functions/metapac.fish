@@ -1,5 +1,5 @@
 function metapac --description "Personal metapackage manager for Arch Linux"
-    argparse -s -N1 h/help v/version -- $argv
+    argparse -s h/help v/version -- $argv
     or return
 
     if set -q _flag_help
@@ -21,6 +21,11 @@ function metapac --description "Personal metapackage manager for Arch Linux"
     if set -q _flag_version
         echo "metapac 0.1.0"
         return 0
+    end
+
+    if not set -q argv[1]
+        echo "metapac: missing command (run 'metapac --help' for usage)" >&2
+        return 1
     end
 
     set subcmd $argv[1]
@@ -53,13 +58,22 @@ function metapac --description "Personal metapackage manager for Arch Linux"
 end
 
 function __metapac_build --description "Build and install a metapackage"
-    argparse -s -N1 -X1 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac build <name>"
         echo "Build and install a metapackage from its .meta definition"
         return 0
+    end
+
+    if test (count $argv) -lt 1
+        echo "metapac build: not enough arguments" >&2
+        return 1
+    end
+    if test (count $argv) -gt 1
+        echo "metapac build: too many arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -133,13 +147,22 @@ buildtoolver = 0.1.0" > $builddir/.BUILDINFO
 end
 
 function __metapac_new --description "Create a new meta definition"
-    argparse -s -N1 -X1 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac new <name>"
         echo "Create a new empty meta definition"
         return 0
+    end
+
+    if test (count $argv) -lt 1
+        echo "metapac new: not enough arguments" >&2
+        return 1
+    end
+    if test (count $argv) -gt 1
+        echo "metapac new: too many arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -162,13 +185,18 @@ function __metapac_new --description "Create a new meta definition"
 end
 
 function __metapac_add --description "Add packages to a meta"
-    argparse -s -N2 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac add <name> <pkg...>"
         echo "Add packages to a meta and mark them as dependencies"
         return 0
+    end
+
+    if test (count $argv) -lt 2
+        echo "metapac add: not enough arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -225,13 +253,18 @@ function __metapac_add --description "Add packages to a meta"
 end
 
 function __metapac_adopt --description "Migrate installed packages into a meta"
-    argparse -s -N2 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac adopt <name> <pkg...>"
         echo "Migrate already-installed packages into a meta (marks as dependencies)"
         return 0
+    end
+
+    if test (count $argv) -lt 2
+        echo "metapac adopt: not enough arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -292,13 +325,18 @@ function __metapac_adopt --description "Migrate installed packages into a meta"
 end
 
 function __metapac_remove --description "Remove packages from a meta"
-    argparse -s -N2 h/help 'no-orphans' -- $argv
+    argparse -s h/help 'no-orphans' -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac remove [--no-orphans] <name> <pkg...>"
         echo "Remove packages from a meta (prompts to uninstall orphans)"
         return 0
+    end
+
+    if test (count $argv) -lt 2
+        echo "metapac remove: not enough arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -355,13 +393,22 @@ function __metapac_remove --description "Remove packages from a meta"
 end
 
 function __metapac_drop --description "Uninstall a metapackage entirely"
-    argparse -s -N1 -X1 h/help 'delete' -- $argv
+    argparse -s h/help 'delete' -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac drop [--delete] <name>"
         echo "Uninstall a metapackage and its unneeded dependencies"
         return 0
+    end
+
+    if test (count $argv) -lt 1
+        echo "metapac drop: not enough arguments" >&2
+        return 1
+    end
+    if test (count $argv) -gt 1
+        echo "metapac drop: too many arguments" >&2
+        return 1
     end
 
     set name $argv[1]
@@ -389,13 +436,18 @@ function __metapac_drop --description "Uninstall a metapackage entirely"
 end
 
 function __metapac_list --description "List metas or packages in a meta"
-    argparse -s -X1 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac list [name]"
         echo "List all metas, or packages in a specific meta"
         return 0
+    end
+
+    if test (count $argv) -gt 1
+        echo "metapac list: too many arguments" >&2
+        return 1
     end
 
     set config_dir (__metapac_config_dir)
@@ -417,13 +469,18 @@ function __metapac_list --description "List metas or packages in a meta"
 end
 
 function __metapac_status --description "Show install status of all metas"
-    argparse -s -X0 h/help -- $argv
+    argparse -s h/help -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac status"
         echo "Show install status of all metas"
         return 0
+    end
+
+    if test (count $argv) -gt 0
+        echo "metapac status: too many arguments" >&2
+        return 1
     end
 
     set config_dir (__metapac_config_dir)
@@ -449,13 +506,18 @@ function __metapac_status --description "Show install status of all metas"
 end
 
 function __metapac_preset --description "Manage archinstall desktop presets"
-    argparse -s -N1 h/help 'variant=' -- $argv
+    argparse -s h/help 'variant=' -- $argv
     or return
 
     if set -q _flag_help
         echo "Usage: metapac preset {list|show|create} [name]"
         echo "Manage archinstall desktop presets"
         return 0
+    end
+
+    if test (count $argv) -lt 1
+        echo "metapac preset: not enough arguments" >&2
+        return 1
     end
 
     set subcmd $argv[1]
