@@ -41,6 +41,7 @@ complete -c metapac -n '__metapac_using_subcmd preset; and not __fish_seen_subco
 complete -c metapac -n '__metapac_using_subcmd preset; and not __fish_seen_subcommand_from list show create' -a show -d "Show preset packages"
 complete -c metapac -n '__metapac_using_subcmd preset; and not __fish_seen_subcommand_from list show create' -a create -d "Create meta from preset"
 complete -c metapac -n '__metapac_using_subcmd preset; and __fish_seen_subcommand_from show create' -a '(__metapac_list_presets)' -d Preset
+complete -c metapac -n '__metapac_using_subcmd preset; and __fish_seen_subcommand_from show create' -l variant -d "Plasma variant" -xa "recommended extensive minimal"
 
 complete -c metapac -n '__metapac_using_subcmd drop' -l delete -d "Also delete the .meta file"
 complete -c metapac -n '__metapac_using_subcmd remove' -l no-orphans -d "Skip orphan removal prompt"

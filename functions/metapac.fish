@@ -52,7 +52,7 @@ function metapac --description "Personal metapackage manager for Arch Linux"
             __metapac_preset $args
         case '*'
             echo "metapac: unknown command: $subcmd" >&2
-            echo "Run \'metapac --help\' for usage." >&2
+            echo "Run 'metapac --help' for usage." >&2
             return 1
     end
 end
@@ -359,6 +359,9 @@ function __metapac_remove --description "Remove packages from a meta"
         end
     end
 
+    set backup (mktemp)
+    command cp $metafile $backup
+
     set tmpfile (mktemp)
     while read -l line
         set trimmed (string trim $line)
@@ -371,15 +374,21 @@ function __metapac_remove --description "Remove packages from a meta"
     command mv $tmpfile $metafile
 
     if test (count (__metapac_read_meta $metafile)) -gt 0
-        __metapac_build $name
-        or return
+        if not __metapac_build $name
+            command mv $backup $metafile
+            return 1
+        end
     else
         set pkgname metapac-$name
         if pacman -Q $pkgname &>/dev/null
-            sudo pacman -R --noconfirm $pkgname
+            if not sudo pacman -R --noconfirm $pkgname
+                command mv $backup $metafile
+                return 1
+            end
         end
         echo "metapac: $name is now empty"
     end
+    rm -f $backup
 
     if not set -q _flag_no_orphans
         echo "Remove orphaned packages? [y/N]"
